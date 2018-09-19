@@ -6,22 +6,41 @@ import (
 	"io/ioutil"
 	"os"
 	"os/user"
+	"path/filepath"
 )
 
-// Status represents the current state of the player and ship
-type Status struct {
-	Timestamp string  `json:"timestamp"`
-	Event     string  `json:"event"`
-	Flags     int32   `json:"Flags"`
-	Pips      []int32 `json:"Pips"`
-	FireGroup int32   `json:"FireGroup"`
-	GuiFocus  int32   `json:"GuiFocus"`
-	Latitude  float64 `json:"Latitude"`
-	Longitude float64 `json:"Longitude"`
-	Heading   int32   `json:"Heading"`
-	Altitude  int32   `json:"Altitude"`
+const (
+	FlagDocked             int32 = 0x00000001
+	FlagLanded             int32 = 0x00000002
+	FlagLandingGearDown    int32 = 0x00000004
+	FlagShieldsUp          int32 = 0x00000008
+	FlagSupercruise        int32 = 0x00000010
+	FlagFlightAssistOff    int32 = 0x00000020
+	FlagHardpointsDeployed int32 = 0x00000040
+	FlagInWing             int32 = 0x00000080
+	FlagLightsOn           int32 = 0x00000100
+	FlagCargoScoopDeployed int32 = 0x00000200
+	FlagSilentRunning      int32 = 0x00000400
+	FlagScoopingFuel       int32 = 0x00000800
+	FlagSRVHandbrake       int32 = 0x00001000
+	FlagSRVTurret          int32 = 0x00002000
+	FlagSRVUnderShip       int32 = 0x00004000
+	FlagSRVDriveAssist     int32 = 0x00008000
+	FlagFSDMassLocked      int32 = 0x00010000
+	FlagFSDCharging        int32 = 0x00020000
+	FlagFSDCooldown        int32 = 0x00040000
+	FlagLowFuel            int32 = 0x00080000
+	FlagOverheating        int32 = 0x00100000
+	FlagHasLatLong         int32 = 0x00200000
+	FlagIsInDanger         int32 = 0x00400000
+	FlagBeingInterdicted   int32 = 0x00800000
+	FlagInMainShip         int32 = 0x01000000
+	FlagInFighter          int32 = 0x02000000
+	FlagInSRV              int32 = 0x04000000
+)
 
-	// Flags
+// StatusFlags contains boolean flags describing the player and ship
+type StatusFlags struct {
 	Docked             bool
 	Landed             bool
 	LandingGearDown    bool
@@ -51,35 +70,53 @@ type Status struct {
 	InSRV              bool
 }
 
+// Status represents the current state of the player and ship
+type Status struct {
+	Timestamp string  `json:"timestamp"`
+	Event     string  `json:"event"`
+	Flags     int32   `json:"Flags"`
+	Pips      []int32 `json:"Pips"`
+	FireGroup int32   `json:"FireGroup"`
+	GuiFocus  int32   `json:"GuiFocus"`
+	Latitude  float64 `json:"Latitude,omitempty"`
+	Longitude float64 `json:"Longitude,omitempty"`
+	Heading   int32   `json:"Heading,omitempty"`
+	Altitude  int32   `json:"Altitude,omitempty"`
+}
+
 // ExpandFlags parses the flags value and expands it into the corresponding flag fields
-func (status *Status) ExpandFlags() {
-	status.Docked = status.Flags&(1<<0) > 0
-	status.Landed = status.Flags&(1<<1) > 0
-	status.LandingGearDown = status.Flags&(1<<2) > 0
-	status.ShieldsUp = status.Flags&(1<<3) > 0
-	status.Supercruise = status.Flags&(1<<4) > 0
-	status.FlightAssistOff = status.Flags&(1<<5) > 0
-	status.HardpointsDeployed = status.Flags&(1<<6) > 0
-	status.InWing = status.Flags&(1<<7) > 0
-	status.LightsOn = status.Flags&(1<<8) > 0
-	status.CargoScoopDeployed = status.Flags&(1<<9) > 0
-	status.SilentRunning = status.Flags&(1<<10) > 0
-	status.ScoopingFuel = status.Flags&(1<<11) > 0
-	status.SRVHandbrake = status.Flags&(1<<12) > 0
-	status.SRVTurret = status.Flags&(1<<13) > 0
-	status.SRVUnderShip = status.Flags&(1<<14) > 0
-	status.SRVDriveAssist = status.Flags&(1<<15) > 0
-	status.FSDMassLocked = status.Flags&(1<<16) > 0
-	status.FSDCharging = status.Flags&(1<<17) > 0
-	status.FSDCooldown = status.Flags&(1<<18) > 0
-	status.LowFuel = status.Flags&(1<<19) > 0
-	status.Overheating = status.Flags&(1<<20) > 0
-	status.HasLatLong = status.Flags&(1<<21) > 0
-	status.IsInDanger = status.Flags&(1<<22) > 0
-	status.BeingInterdicted = status.Flags&(1<<23) > 0
-	status.InMainShip = status.Flags&(1<<24) > 0
-	status.InFighter = status.Flags&(1<<25) > 0
-	status.InSRV = status.Flags&(1<<26) > 0
+func (status *Status) ExpandFlags() StatusFlags {
+	flags := StatusFlags{}
+
+	flags.Docked = status.Flags&FlagDocked != 0
+	flags.Landed = status.Flags&FlagLanded != 0
+	flags.LandingGearDown = status.Flags&FlagLandingGearDown != 0
+	flags.ShieldsUp = status.Flags&FlagShieldsUp != 0
+	flags.Supercruise = status.Flags&FlagSupercruise != 0
+	flags.FlightAssistOff = status.Flags&FlagFlightAssistOff != 0
+	flags.HardpointsDeployed = status.Flags&FlagHardpointsDeployed != 0
+	flags.InWing = status.Flags&FlagInWing != 0
+	flags.LightsOn = status.Flags&FlagLightsOn != 0
+	flags.CargoScoopDeployed = status.Flags&FlagCargoScoopDeployed != 0
+	flags.SilentRunning = status.Flags&FlagSilentRunning != 0
+	flags.ScoopingFuel = status.Flags&FlagScoopingFuel != 0
+	flags.SRVHandbrake = status.Flags&FlagSRVHandbrake != 0
+	flags.SRVTurret = status.Flags&FlagSRVTurret != 0
+	flags.SRVUnderShip = status.Flags&FlagSRVUnderShip != 0
+	flags.SRVDriveAssist = status.Flags&FlagSRVDriveAssist != 0
+	flags.FSDMassLocked = status.Flags&FlagFSDMassLocked != 0
+	flags.FSDCharging = status.Flags&FlagFSDCharging != 0
+	flags.FSDCooldown = status.Flags&FlagFSDCooldown != 0
+	flags.LowFuel = status.Flags&FlagLowFuel != 0
+	flags.Overheating = status.Flags&FlagOverheating != 0
+	flags.HasLatLong = status.Flags&FlagHasLatLong != 0
+	flags.IsInDanger = status.Flags&FlagIsInDanger != 0
+	flags.BeingInterdicted = status.Flags&FlagBeingInterdicted != 0
+	flags.InMainShip = status.Flags&FlagInMainShip != 0
+	flags.InFighter = status.Flags&FlagInFighter != 0
+	flags.InSRV = status.Flags&FlagInSRV != 0
+
+	return flags
 }
 
 // GetStatus reads the current player and ship status from Status.json
@@ -89,7 +126,7 @@ func GetStatus() (*Status, error) {
 		return nil, errors.New("Couldn't get current user: " + err.Error())
 	}
 
-	statusFilePath := currUser.HomeDir + "\\Saved Games\\Frontier Developments\\Elite Dangerous\\Status.json"
+	statusFilePath := filepath.FromSlash(currUser.HomeDir + "/Saved Games/Frontier Developments/Elite Dangerous/Status.json")
 	statusFile, err := os.Open(statusFilePath)
 	if err != nil {
 		return nil, errors.New("Couldn't open Status.json file: " + err.Error())
@@ -99,6 +136,18 @@ func GetStatus() (*Status, error) {
 	if err != nil {
 		return nil, errors.New("Couldn't read Status.json file: " + err.Error())
 	}
+
+	status := &Status{}
+	if err := json.Unmarshal(statusBytes, status); err != nil {
+		return nil, errors.New("Couldn't unmarshal Status.json file: " + err.Error())
+	}
+
+	return status, nil
+}
+
+// GetStatusFromString reads the current player and ship status from Status.json
+func GetStatusFromString(content string) (*Status, error) {
+	statusBytes := []byte(content)
 
 	status := &Status{}
 	if err := json.Unmarshal(statusBytes, status); err != nil {
