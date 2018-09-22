@@ -3,7 +3,6 @@ package elite
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/user"
@@ -134,25 +133,22 @@ func GetStatus() (*Status, error) {
 	for retries > 0 {
 		statusFile, err := os.Open(statusFilePath)
 		if err != nil {
-			fmt.Println("Couldn't open Status.json file: " + err.Error())
 			retries = retries - 1
-			time.Sleep(20 * time.Millisecond)
+			time.Sleep(3 * time.Millisecond)
 			continue
 		}
 
 		statusBytes, err := ioutil.ReadAll(statusFile)
 		if err != nil {
-			fmt.Println("Couldn't read Status.json file: " + err.Error())
 			retries = retries - 1
-			time.Sleep(20 * time.Millisecond)
+			time.Sleep(3 * time.Millisecond)
 			continue
 		}
 
 		status := &Status{}
 		if err := json.Unmarshal(statusBytes, status); err != nil {
-			fmt.Println("Couldn't read Status file. Retrying...")
 			retries = retries - 1
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(3 * time.Millisecond)
 			continue
 		}
 

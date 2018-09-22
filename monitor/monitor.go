@@ -8,6 +8,8 @@ import (
 	"github.com/tarm/serial"
 )
 
+var buff = make([]byte, 4)
+
 func main() {
 	conf := &serial.Config{Name: "COM6", Baud: 9600}
 	s, err := serial.OpenPort(conf)
@@ -15,27 +17,25 @@ func main() {
 		panic("Couldn't open port: " + err.Error())
 	}
 
-	lastMod := time.Date(1980, time.January, 1, 0, 0, 0, 0, time.UTC)
+	errorCount := 0
+	lastTime := ""
 	for {
-		mod, err := elite.GetStatusLastModified()
+		status, err := elite.GetStatus()
 		if err != nil {
-			panic(err)
-		}
-
-		if mod.After(lastMod) {
-			status, err := elite.GetStatus()
-			if err != nil {
-				panic(err)
+			errorCount = errorCount + 1
+			if errorCount > 20 {
+				panic("Can't read status file: " + err.Error())
 			}
+		} else if status.Timestamp != lastTime {
+			errorCount = 0
 
-			bytes := make([]byte, 4)
-			binary.BigEndian.PutUint32(bytes, status.Flags)
-			_, err = s.Write(bytes)
+			binary.BigEndian.PutUint32(buff, status.Flags)
+			_, err = s.Write(buff)
 			if err != nil {
 				panic("Couldn't write to device: " + err.Error())
 			}
 		}
 
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 	}
 }
