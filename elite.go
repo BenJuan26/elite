@@ -3,40 +3,42 @@ package elite
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
+	"time"
 )
 
 const (
-	FlagDocked             int32 = 0x00000001
-	FlagLanded             int32 = 0x00000002
-	FlagLandingGearDown    int32 = 0x00000004
-	FlagShieldsUp          int32 = 0x00000008
-	FlagSupercruise        int32 = 0x00000010
-	FlagFlightAssistOff    int32 = 0x00000020
-	FlagHardpointsDeployed int32 = 0x00000040
-	FlagInWing             int32 = 0x00000080
-	FlagLightsOn           int32 = 0x00000100
-	FlagCargoScoopDeployed int32 = 0x00000200
-	FlagSilentRunning      int32 = 0x00000400
-	FlagScoopingFuel       int32 = 0x00000800
-	FlagSRVHandbrake       int32 = 0x00001000
-	FlagSRVTurret          int32 = 0x00002000
-	FlagSRVUnderShip       int32 = 0x00004000
-	FlagSRVDriveAssist     int32 = 0x00008000
-	FlagFSDMassLocked      int32 = 0x00010000
-	FlagFSDCharging        int32 = 0x00020000
-	FlagFSDCooldown        int32 = 0x00040000
-	FlagLowFuel            int32 = 0x00080000
-	FlagOverheating        int32 = 0x00100000
-	FlagHasLatLong         int32 = 0x00200000
-	FlagIsInDanger         int32 = 0x00400000
-	FlagBeingInterdicted   int32 = 0x00800000
-	FlagInMainShip         int32 = 0x01000000
-	FlagInFighter          int32 = 0x02000000
-	FlagInSRV              int32 = 0x04000000
+	FlagDocked             uint32 = 0x00000001
+	FlagLanded             uint32 = 0x00000002
+	FlagLandingGearDown    uint32 = 0x00000004
+	FlagShieldsUp          uint32 = 0x00000008
+	FlagSupercruise        uint32 = 0x00000010
+	FlagFlightAssistOff    uint32 = 0x00000020
+	FlagHardpointsDeployed uint32 = 0x00000040
+	FlagInWing             uint32 = 0x00000080
+	FlagLightsOn           uint32 = 0x00000100
+	FlagCargoScoopDeployed uint32 = 0x00000200
+	FlagSilentRunning      uint32 = 0x00000400
+	FlagScoopingFuel       uint32 = 0x00000800
+	FlagSRVHandbrake       uint32 = 0x00001000
+	FlagSRVTurret          uint32 = 0x00002000
+	FlagSRVUnderShip       uint32 = 0x00004000
+	FlagSRVDriveAssist     uint32 = 0x00008000
+	FlagFSDMassLocked      uint32 = 0x00010000
+	FlagFSDCharging        uint32 = 0x00020000
+	FlagFSDCooldown        uint32 = 0x00040000
+	FlagLowFuel            uint32 = 0x00080000
+	FlagOverheating        uint32 = 0x00100000
+	FlagHasLatLong         uint32 = 0x00200000
+	FlagIsInDanger         uint32 = 0x00400000
+	FlagBeingInterdicted   uint32 = 0x00800000
+	FlagInMainShip         uint32 = 0x01000000
+	FlagInFighter          uint32 = 0x02000000
+	FlagInSRV              uint32 = 0x04000000
 )
 
 // StatusFlags contains boolean flags describing the player and ship
@@ -74,7 +76,7 @@ type StatusFlags struct {
 type Status struct {
 	Timestamp string  `json:"timestamp"`
 	Event     string  `json:"event"`
-	Flags     int32   `json:"Flags"`
+	Flags     uint32  `json:"Flags"`
 	Pips      []int32 `json:"Pips"`
 	FireGroup int32   `json:"FireGroup"`
 	GuiFocus  int32   `json:"GuiFocus"`
@@ -82,6 +84,13 @@ type Status struct {
 	Longitude float64 `json:"Longitude,omitempty"`
 	Heading   int32   `json:"Heading,omitempty"`
 	Altitude  int32   `json:"Altitude,omitempty"`
+}
+
+var statusFilePath string
+
+func init() {
+	currUser, _ := user.Current()
+	statusFilePath = filepath.FromSlash(currUser.HomeDir + "/Saved Games/Frontier Developments/Elite Dangerous/Status.json")
 }
 
 // ExpandFlags parses the flags value and expands it into the corresponding flag fields
@@ -121,28 +130,36 @@ func (status *Status) ExpandFlags() StatusFlags {
 
 // GetStatus reads the current player and ship status from Status.json
 func GetStatus() (*Status, error) {
-	currUser, err := user.Current()
-	if err != nil {
-		return nil, errors.New("Couldn't get current user: " + err.Error())
+	retries := 5
+	for retries > 0 {
+		statusFile, err := os.Open(statusFilePath)
+		if err != nil {
+			fmt.Println("Couldn't open Status.json file: " + err.Error())
+			retries = retries - 1
+			time.Sleep(20 * time.Millisecond)
+			continue
+		}
+
+		statusBytes, err := ioutil.ReadAll(statusFile)
+		if err != nil {
+			fmt.Println("Couldn't read Status.json file: " + err.Error())
+			retries = retries - 1
+			time.Sleep(20 * time.Millisecond)
+			continue
+		}
+
+		status := &Status{}
+		if err := json.Unmarshal(statusBytes, status); err != nil {
+			fmt.Println("Couldn't read Status file. Retrying...")
+			retries = retries - 1
+			time.Sleep(10 * time.Millisecond)
+			continue
+		}
+
+		return status, nil
 	}
 
-	statusFilePath := filepath.FromSlash(currUser.HomeDir + "/Saved Games/Frontier Developments/Elite Dangerous/Status.json")
-	statusFile, err := os.Open(statusFilePath)
-	if err != nil {
-		return nil, errors.New("Couldn't open Status.json file: " + err.Error())
-	}
-
-	statusBytes, err := ioutil.ReadAll(statusFile)
-	if err != nil {
-		return nil, errors.New("Couldn't read Status.json file: " + err.Error())
-	}
-
-	status := &Status{}
-	if err := json.Unmarshal(statusBytes, status); err != nil {
-		return nil, errors.New("Couldn't unmarshal Status.json file: " + err.Error())
-	}
-
-	return status, nil
+	return nil, errors.New("Couldn't get status after 5 attempts")
 }
 
 // GetStatusFromString reads the current player and ship status from Status.json
@@ -155,4 +172,14 @@ func GetStatusFromString(content string) (*Status, error) {
 	}
 
 	return status, nil
+}
+
+// GetStatusLastModified gets the time the status.json file was last modified
+func GetStatusLastModified() (time.Time, error) {
+	info, err := os.Stat(statusFilePath)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return info.ModTime(), nil
 }

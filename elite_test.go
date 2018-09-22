@@ -20,15 +20,9 @@ func TestGetStatusFromString(t *testing.T) {
 }
 
 func TestGetStatus(t *testing.T) {
-	status, err := GetStatus()
+	_, err := GetStatus()
 	if err != nil {
 		fmt.Println("Couldn't get status: " + err.Error())
-		t.FailNow()
-	}
-
-	flags := status.ExpandFlags()
-	if !flags.Docked || !flags.ShieldsUp || !flags.InMainShip {
-		fmt.Println("Parsed flags were incorrect")
 		t.FailNow()
 	}
 }
