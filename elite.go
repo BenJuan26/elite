@@ -1,12 +1,14 @@
 package elite
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
+	"regexp"
 	"time"
 )
 
@@ -85,14 +87,22 @@ type Status struct {
 	Altitude  int32   `json:"Altitude,omitempty"`
 }
 
+type starSystemEvent struct {
+	Timestamp  string `json:"timestamp"`
+	Event      string `json:"event"`
+	StarSystem string `json:"StarSystem,omitempty"`
+}
+
 var statusFilePath string
+var logPath string
 
 func init() {
 	currUser, _ := user.Current()
-	statusFilePath = filepath.FromSlash(currUser.HomeDir + "/Saved Games/Frontier Developments/Elite Dangerous/Status.json")
+	logPath = filepath.FromSlash(currUser.HomeDir + "/Saved Games/Frontier Developments/Elite Dangerous")
+	statusFilePath = filepath.Join(logPath, "Status.json")
 }
 
-// ExpandFlags parses the flags value and expands it into the corresponding flag fields
+// ExpandFlags parses the flags value and returns the flags in a StatusFlags struct
 func (status *Status) ExpandFlags() StatusFlags {
 	flags := StatusFlags{}
 
@@ -127,6 +137,45 @@ func (status *Status) ExpandFlags() StatusFlags {
 	return flags
 }
 
+// GetStarSystem returns the current star system
+func GetStarSystem() (string, error) {
+	files, _ := ioutil.ReadDir(logPath)
+	journalFilePattern, err := regexp.Compile(`^Journal\.\d{12}\.\d{2}\.log$`)
+	if err != nil {
+		return "", err
+	}
+
+	found := false
+	var event starSystemEvent
+	for i := len(files) - 1; i >= 0 && !found; i-- {
+		if !journalFilePattern.MatchString(files[i].Name()) {
+			continue
+		}
+
+		journalFile, err := os.Open(filepath.Join(logPath, files[i].Name()))
+		if err != nil {
+			return "", err
+		}
+		defer journalFile.Close()
+
+		scanner := bufio.NewScanner(journalFile)
+		for scanner.Scan() {
+			var tempEvent starSystemEvent
+			json.Unmarshal([]byte(scanner.Text()), &tempEvent)
+			if tempEvent.Event == "FSDJump" || tempEvent.Event == "Location" {
+				event = tempEvent
+				found = true
+			}
+		}
+	}
+
+	if !found {
+		return "", errors.New("No location found in all log files")
+	}
+
+	return event.StarSystem, nil
+}
+
 // GetStatus reads the current player and ship status from Status.json
 func GetStatus() (*Status, error) {
 	retries := 5
@@ -137,6 +186,7 @@ func GetStatus() (*Status, error) {
 			time.Sleep(3 * time.Millisecond)
 			continue
 		}
+		defer statusFile.Close()
 
 		statusBytes, err := ioutil.ReadAll(statusFile)
 		if err != nil {
