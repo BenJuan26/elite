@@ -75,16 +75,16 @@ type StatusFlags struct {
 
 // Status represents the current state of the player and ship
 type Status struct {
-	Timestamp string  `json:"timestamp"`
-	Event     string  `json:"event"`
-	Flags     uint32  `json:"Flags"`
-	Pips      []int32 `json:"Pips"`
-	FireGroup int32   `json:"FireGroup"`
-	GuiFocus  int32   `json:"GuiFocus"`
-	Latitude  float64 `json:"Latitude,omitempty"`
-	Longitude float64 `json:"Longitude,omitempty"`
-	Heading   int32   `json:"Heading,omitempty"`
-	Altitude  int32   `json:"Altitude,omitempty"`
+	Timestamp string   `json:"timestamp"`
+	Event     string   `json:"event"`
+	Flags     uint32   `json:"Flags"`
+	Pips      [3]int32 `json:"Pips"`
+	FireGroup int32    `json:"FireGroup"`
+	GuiFocus  int32    `json:"GuiFocus"`
+	Latitude  float64  `json:"Latitude,omitempty"`
+	Longitude float64  `json:"Longitude,omitempty"`
+	Heading   int32    `json:"Heading,omitempty"`
+	Altitude  int32    `json:"Altitude,omitempty"`
 }
 
 type starSystemEvent struct {

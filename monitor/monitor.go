@@ -1,14 +1,20 @@
 package main
 
 import (
-	"encoding/binary"
+	"encoding/json"
 	"time"
 
 	"github.com/BenJuan26/elite"
 	"github.com/tarm/serial"
 )
 
-var buff = make([]byte, 4)
+type controllerInfo struct {
+	Timestamp  string   `json:"timestamp"`
+	Flags      uint32   `json:"Flags"`
+	Pips       [3]int32 `json:"Pips"`
+	FireGroup  int32    `json:"FireGroup"`
+	StarSystem string   `json:"StarSystem"`
+}
 
 func main() {
 	conf := &serial.Config{Name: "COM6", Baud: 9600}
@@ -18,24 +24,55 @@ func main() {
 	}
 
 	errorCount := 0
-	lastTime := ""
+	lastStatus := &elite.Status{}
+	lastSystem := ""
 	for {
+		if errorCount > 20 {
+			panic("Too many errors")
+		}
+
 		status, err := elite.GetStatus()
 		if err != nil {
 			errorCount = errorCount + 1
-			if errorCount > 20 {
-				panic("Can't read status file: " + err.Error())
-			}
-		} else if status.Timestamp != lastTime {
-			errorCount = 0
+			time.Sleep(5 * time.Millisecond)
+			continue
+		}
 
-			binary.BigEndian.PutUint32(buff, status.Flags)
-			_, err = s.Write(buff)
+		system, err := elite.GetStarSystem()
+		if err != nil {
+			errorCount = errorCount + 1
+			time.Sleep(5 * time.Millisecond)
+			continue
+		}
+
+		if status.Timestamp != lastStatus.Timestamp || lastSystem != system {
+			lastStatus = status
+			lastSystem = system
+
+			info := controllerInfo{
+				Timestamp:  status.Timestamp,
+				Flags:      status.Flags,
+				Pips:       status.Pips,
+				FireGroup:  status.FireGroup,
+				StarSystem: system,
+			}
+
+			infoBytes, err := json.Marshal(info)
 			if err != nil {
-				panic("Couldn't write to device: " + err.Error())
+				errorCount = errorCount + 1
+				time.Sleep(5 * time.Millisecond)
+				continue
+			}
+
+			_, err = s.Write(infoBytes)
+			if err != nil {
+				errorCount = errorCount + 1
+				time.Sleep(5 * time.Millisecond)
+				continue
 			}
 		}
 
+		errorCount = 0
 		time.Sleep(5 * time.Millisecond)
 	}
 }
