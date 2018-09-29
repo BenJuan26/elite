@@ -11,6 +11,7 @@ import (
 
 type config struct {
 	DeviceDescription string `json:"device_description"`
+	BaudRate          int    `json:"baud_rate"`
 	PollInterval      int    `json:"poll_interval"`
 }
 
@@ -25,7 +26,7 @@ func loadConfig(path string) {
 	_, err := os.Stat(path)
 	if err != nil {
 		fmt.Println("WARNING: config.json not found! Using sample values for now, see config-sample.json for a sample")
-		configData = &config{"Arduino Uno", 5}
+		configData = &config{"Arduino Uno", 9600, 5}
 	}
 
 	if configData == nil {
@@ -44,6 +45,11 @@ func loadConfig(path string) {
 // GetDeviceDescription gets the configured serial device description
 func GetDeviceDescription() string {
 	return configData.DeviceDescription
+}
+
+// GetBaudRate gets the configured serial baud rate
+func GetBaudRate() int {
+	return configData.BaudRate
 }
 
 // GetPollInterval gets the configured polling interval in milliseconds

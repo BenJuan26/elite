@@ -33,13 +33,13 @@ func getSerialPort(deviceDescription string) *serial.Port {
 		panic("Couldn't find a serial device with a description matching '" + deviceDescription + "'; is the config.json correct?")
 	}
 
-	conf := &serial.Config{Name: dst[0].DeviceID, Baud: dst[0].MaxBaudRate}
+	conf := &serial.Config{Name: dst[0].DeviceID, Baud: config.GetBaudRate()}
 	s, err := serial.OpenPort(conf)
 	if err != nil {
 		panic("Couldn't open serial port: " + err.Error())
 	}
 
-	fmt.Println("Connected to serial port " + dst[0].DeviceID)
+	fmt.Printf("Connected to serial port %s at baud rate %d\n", dst[0].DeviceID, config.GetBaudRate())
 
 	return s
 }
