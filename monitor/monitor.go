@@ -2,9 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/BenJuan26/elite"
+	"github.com/BenJuan26/elite/monitor/config"
+	"github.com/StackExchange/wmi"
 	"github.com/tarm/serial"
 )
 
@@ -16,12 +19,33 @@ type controllerInfo struct {
 	StarSystem string   `json:"StarSystem"`
 }
 
-func main() {
-	conf := &serial.Config{Name: "COM6", Baud: 9600}
+type serialPort struct {
+	MaxBaudRate int
+	DeviceID    string
+}
+
+func getSerialPort(deviceDescription string) *serial.Port {
+	var dst []serialPort
+	err := wmi.Query("SELECT DeviceID, MaxBaudRate FROM Win32_SerialPort WHERE Description='"+deviceDescription+"'", &dst)
+	if err != nil {
+		panic(err)
+	} else if len(dst) < 1 {
+		panic("Couldn't find a serial device with a description matching '" + deviceDescription + "'; is the config.json correct?")
+	}
+
+	conf := &serial.Config{Name: dst[0].DeviceID, Baud: dst[0].MaxBaudRate}
 	s, err := serial.OpenPort(conf)
 	if err != nil {
-		panic("Couldn't open port: " + err.Error())
+		panic("Couldn't open serial port: " + err.Error())
 	}
+
+	fmt.Println("Connected to serial port " + dst[0].DeviceID)
+
+	return s
+}
+
+func main() {
+	s := getSerialPort(config.GetDeviceDescription())
 
 	errorCount := 0
 	lastStatus := &elite.Status{}
@@ -64,15 +88,18 @@ func main() {
 				continue
 			}
 
-			_, err = s.Write(infoBytes)
+			n, err := s.Write(infoBytes)
 			if err != nil {
+				fmt.Println(err)
 				errorCount = errorCount + 1
 				time.Sleep(5 * time.Millisecond)
 				continue
+			} else {
+				fmt.Printf("Wrote %d bytes\n", n)
 			}
 		}
 
 		errorCount = 0
-		time.Sleep(5 * time.Millisecond)
+		time.Sleep(time.Duration(config.GetPollInterval()) * time.Millisecond)
 	}
 }
