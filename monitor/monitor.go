@@ -5,10 +5,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"time"
+	"strings"
 
 	"github.com/BenJuan26/elite"
-	"github.com/BenJuan26/elite/monitor/config"
 	"github.com/StackExchange/wmi"
 	"github.com/tarm/serial"
 )
@@ -24,84 +23,112 @@ type controllerInfo struct {
 type serialPort struct {
 	MaxBaudRate int
 	DeviceID    string
+	Description string
+	PNPDeviceID string
 }
 
-func getSerialPort(deviceDescription string) *serial.Port {
+type errorNoSerialConnection struct {
+	message string
+}
+
+func (e *errorNoSerialConnection) Error() string {
+	return e.message
+}
+
+func getSerialPort(pnp string) (*serial.Port, error) {
 	var dst []serialPort
-	err := wmi.Query("SELECT DeviceID, MaxBaudRate FROM Win32_SerialPort WHERE Description='"+deviceDescription+"'", &dst)
+	escaped := strings.Replace(pnp, "\\", "\\\\", -1)
+	query := "SELECT DeviceID, MaxBaudRate FROM Win32_SerialPort WHERE PNPDeviceID='" + escaped + "'"
+	client := &wmi.Client{AllowMissingFields: true}
+	err := client.Query(query, &dst)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("Couldn't connect to serial port: %s", err.Error())
 	} else if len(dst) < 1 {
-		panic("Couldn't find a serial device with a description matching '" + deviceDescription + "'; is the config.json correct?")
+		return nil, fmt.Errorf("Couldn't find a PNP Device with ID '%s'", pnp)
 	}
 
-	conf := &serial.Config{Name: dst[0].DeviceID, Baud: config.GetBaudRate()}
+	conf := &serial.Config{Name: dst[0].DeviceID, Baud: getBaudRate()}
 	s, err := serial.OpenPort(conf)
 	if err != nil {
-		panic("Couldn't open serial port: " + err.Error())
+		return nil, fmt.Errorf("Couldn't open serial port: %s", err.Error())
 	}
 
-	fmt.Printf("Connected to serial port %s at baud rate %d\n", dst[0].DeviceID, config.GetBaudRate())
-
-	return s
+	elog.Info(1, fmt.Sprintf("Connected to serial port %s at baud rate %d\n", dst[0].DeviceID, getBaudRate()))
+	return s, nil
 }
 
-func main() {
-	s := getSerialPort(config.GetDeviceDescription())
+var errorCount = 0
+var lastStatus = &elite.Status{}
+var lastSystem = ""
+var s *serial.Port
 
-	errorCount := 0
-	lastStatus := &elite.Status{}
-	lastSystem := ""
-	for {
-		if errorCount > 20 {
-			panic("Too many errors")
-		}
-
-		status, err := elite.GetStatus()
-		if err != nil {
-			errorCount = errorCount + 1
-			time.Sleep(5 * time.Millisecond)
-			continue
-		}
-
-		system, err := elite.GetStarSystem()
-		if err != nil {
-			errorCount = errorCount + 1
-			time.Sleep(5 * time.Millisecond)
-			continue
-		}
-
-		if status.Timestamp != lastStatus.Timestamp || lastSystem != system {
-			lastStatus = status
-			lastSystem = system
-
-			info := controllerInfo{
-				Timestamp:  status.Timestamp,
-				Flags:      status.Flags,
-				Pips:       status.Pips,
-				FireGroup:  status.FireGroup,
-				StarSystem: system,
-			}
-
-			infoBytes, err := json.Marshal(info)
-			if err != nil {
-				errorCount = errorCount + 1
-				time.Sleep(5 * time.Millisecond)
-				continue
-			}
-
-			n, err := s.Write(infoBytes)
-			if err != nil {
-				fmt.Println(err)
-				errorCount = errorCount + 1
-				time.Sleep(5 * time.Millisecond)
-				continue
-			} else {
-				fmt.Printf("Wrote %d bytes\n", n)
-			}
-		}
-
-		errorCount = 0
-		time.Sleep(time.Duration(config.GetPollInterval()) * time.Millisecond)
+func checkStatusAndUpdate() error {
+	elog.Info(1, "In loop")
+	if errorCount > 20 {
+		return fmt.Errorf("Too many consecutive errors")
 	}
+
+	var err error
+	if s == nil {
+		s, err = getSerialPort(getPNPDeviceID())
+		if err != nil {
+			elog.Error(1, "No serial connection: "+err.Error())
+			return &errorNoSerialConnection{err.Error()}
+		}
+
+	}
+
+	status, err := elite.GetStatus()
+	if err != nil {
+		errorCount = errorCount + 1
+		elog.Error(1, "Couldn't get status: "+err.Error())
+		if errorCount > 1 {
+			elog.Error(1, fmt.Sprintf("Now at %d consecutive errors", errorCount))
+		}
+		return nil
+	}
+
+	system, err := elite.GetStarSystem()
+	if err != nil {
+		errorCount = errorCount + 1
+		elog.Error(1, "Couldn't get star system: "+err.Error())
+		if errorCount > 1 {
+			elog.Error(1, fmt.Sprintf("Now at %d consecutive errors", errorCount))
+		}
+		return nil
+	}
+
+	if status.Timestamp != lastStatus.Timestamp || lastSystem != system {
+		lastStatus = status
+		lastSystem = system
+
+		info := controllerInfo{
+			Timestamp:  status.Timestamp,
+			Flags:      status.Flags,
+			Pips:       status.Pips,
+			FireGroup:  status.FireGroup,
+			StarSystem: system,
+		}
+
+		infoBytes, err := json.Marshal(info)
+		if err != nil {
+			errorCount = errorCount + 1
+			elog.Error(1, "Couldn't marshal JSON to send to serial: "+err.Error())
+			if errorCount > 1 {
+				elog.Error(1, fmt.Sprintf("Now at %d consecutive errors", errorCount))
+			}
+			return nil
+		}
+
+		_, err = s.Write(infoBytes)
+		if err != nil {
+			errorCount = errorCount + 1
+			s = nil
+			elog.Error(1, "Couldn't write to serial port: "+err.Error())
+			return nil
+		}
+	}
+
+	errorCount = 0
+	return nil
 }

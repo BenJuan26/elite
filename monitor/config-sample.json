@@ -1,5 +1,4 @@
 {
-    "device_description": "Arduino Uno",
-    "baud_rate": 9600,
-    "poll_interval": 5
+    "pnp_device_id":"USB\\VID_16C0\u0026PID_0483\\4270260",
+    "baud_rate":9600
 }
