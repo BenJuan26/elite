@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/user"
 	"path/filepath"
 	"strconv"
 	"text/tabwriter"
@@ -19,6 +20,7 @@ import (
 type config struct {
 	PNPDeviceID string `json:"pnp_device_id"`
 	BaudRate    int    `json:"baud_rate"`
+	LogDir      string `json:"log_dir"`
 }
 
 var configData *config
@@ -94,7 +96,34 @@ func interactiveConfig() error {
 		return fmt.Errorf("Invalid selection: %s", baudRateSelection)
 	}
 
-	conf := config{pnp, int(baudRate)}
+	currUser, _ := user.Current()
+	path := filepath.ToSlash(currUser.HomeDir) + "/Saved Games/Frontier Developments/Elite Dangerous"
+	pathInfo, err := os.Stat(filepath.FromSlash(path))
+	isPathValid := err == nil && pathInfo.IsDir()
+	if !isPathValid {
+		fmt.Printf("Enter the Elite Dangerous log path: ")
+	} else {
+		fmt.Printf("\nDefault logs folder: %s\n", path)
+		fmt.Printf("Enter a different one, or press enter to use the above: ")
+	}
+
+	scanner.Scan()
+	logDirSelection := scanner.Text()
+
+	logDir := ""
+	if len(logDirSelection) > 2 {
+		logDirInfo, err := os.Stat(filepath.FromSlash(logDirSelection))
+		if err != nil || !logDirInfo.IsDir() {
+			return fmt.Errorf("Couldn't find the selected log path: " + err.Error())
+		}
+		logDir = logDirSelection
+	} else if isPathValid {
+		logDir = path
+	} else {
+		return fmt.Errorf("Must enter a valid path")
+	}
+
+	conf := config{pnp, int(baudRate), logDir}
 	confBytes, err := json.Marshal(conf)
 	if err != nil {
 		return fmt.Errorf("Couldn't marshal config into JSON: %s", err.Error())
@@ -104,6 +133,8 @@ func interactiveConfig() error {
 	if err != nil {
 		return fmt.Errorf("Couldn't write config.json file: %s", err.Error())
 	}
+
+	fmt.Println("Wrote config to " + filepath.ToSlash(configPath()))
 
 	return nil
 }

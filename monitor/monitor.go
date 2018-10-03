@@ -37,6 +37,8 @@ func (e *errorNoSerialConnection) Error() string {
 
 func getSerialPort(pnp string) (*serial.Port, error) {
 	var dst []serialPort
+
+	// WMI needs the backslashes to be escaped
 	escaped := strings.Replace(pnp, "\\", "\\\\", -1)
 	query := "SELECT DeviceID, MaxBaudRate FROM Win32_SerialPort WHERE PNPDeviceID='" + escaped + "'"
 	client := &wmi.Client{AllowMissingFields: true}
@@ -53,8 +55,22 @@ func getSerialPort(pnp string) (*serial.Port, error) {
 		return nil, fmt.Errorf("Couldn't open serial port: %s", err.Error())
 	}
 
-	elog.Info(1, fmt.Sprintf("Connected to serial port %s at baud rate %d\n", dst[0].DeviceID, getBaudRate()))
+	elog.Info(1, fmt.Sprintf("Connected to serial port %s at baud rate %d", dst[0].DeviceID, getBaudRate()))
 	return s, nil
+}
+
+func isSerialConnected() bool {
+	var dst []serialPort
+	escaped := strings.Replace(getPNPDeviceID(), "\\", "\\\\", -1)
+	query := "SELECT DeviceID FROM Win32_SerialPort WHERE PNPDeviceID='" + escaped + "'"
+	client := &wmi.Client{AllowMissingFields: true}
+	client.Query(query, &dst)
+
+	if len(dst) < 1 {
+		return false
+	}
+
+	return true
 }
 
 var errorCount = 0
@@ -62,17 +78,34 @@ var lastStatus = &elite.Status{}
 var lastSystem = ""
 var s *serial.Port
 
+func startWaitingForSerialDevice() {
+	s = nil
+	lastStatus = &elite.Status{}
+	lastSystem = ""
+	elog.Info(1, "Couldn't write to serial port")
+	elog.Info(1, "Going to sleep until there is a serial connection (checking every 10 seconds)")
+}
+
+var count = 0
+
 func checkStatusAndUpdate() error {
-	elog.Info(1, "In loop")
 	if errorCount > 20 {
 		return fmt.Errorf("Too many consecutive errors")
+	}
+
+	// Check in on the serial device every once in a while
+	if count > 50 {
+		count = 0
+		if !isSerialConnected() {
+			startWaitingForSerialDevice()
+			return &errorNoSerialConnection{"Device not connected"}
+		}
 	}
 
 	var err error
 	if s == nil {
 		s, err = getSerialPort(getPNPDeviceID())
 		if err != nil {
-			elog.Error(1, "No serial connection: "+err.Error())
 			return &errorNoSerialConnection{err.Error()}
 		}
 
@@ -123,12 +156,12 @@ func checkStatusAndUpdate() error {
 		_, err = s.Write(infoBytes)
 		if err != nil {
 			errorCount = errorCount + 1
-			s = nil
-			elog.Error(1, "Couldn't write to serial port: "+err.Error())
+			startWaitingForSerialDevice()
 			return nil
 		}
 	}
 
 	errorCount = 0
+	count = count + 1
 	return nil
 }
