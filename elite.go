@@ -95,13 +95,12 @@ type starSystemEvent struct {
 	StarSystem string `json:"StarSystem,omitempty"`
 }
 
-var statusFilePath string
-var logPath string
+var defaultLogPath string
 
 func init() {
 	currUser, _ := user.Current()
-	logPath = filepath.FromSlash(currUser.HomeDir + "/Saved Games/Frontier Developments/Elite Dangerous")
-	statusFilePath = filepath.Join(logPath, "Status.json")
+	homeDir := currUser.HomeDir
+	defaultLogPath = filepath.FromSlash(homeDir + "/Saved Games/Frontier Developments/Elite Dangerous")
 }
 
 // ExpandFlags parses the flags value and returns the flags in a StatusFlags struct
@@ -141,6 +140,11 @@ func (status *Status) ExpandFlags() StatusFlags {
 
 // GetStarSystem returns the current star system
 func GetStarSystem() (string, error) {
+	return GetStarSystemFromPath(defaultLogPath)
+}
+
+// GetStarSystemFromPath returns the current star system using the specified log path
+func GetStarSystemFromPath(logPath string) (string, error) {
 	files, _ := ioutil.ReadDir(logPath)
 	journalFilePattern, err := regexp.Compile(`^Journal\.\d{12}\.\d{2}\.log$`)
 	if err != nil {
@@ -180,6 +184,12 @@ func GetStarSystem() (string, error) {
 
 // GetStatus reads the current player and ship status from Status.json
 func GetStatus() (*Status, error) {
+	return GetStatusFromPath(defaultLogPath)
+}
+
+// GetStatusFromPath reads the current player and ship status from Status.json at the specified log path
+func GetStatusFromPath(logPath string) (*Status, error) {
+	statusFilePath := filepath.FromSlash(logPath + "/Status.json")
 	retries := 5
 	for retries > 0 {
 		statusFile, err := os.Open(statusFilePath)
@@ -220,14 +230,4 @@ func GetStatusFromString(content string) (*Status, error) {
 	}
 
 	return status, nil
-}
-
-// GetStatusLastModified gets the time the status.json file was last modified
-func GetStatusLastModified() (time.Time, error) {
-	info, err := os.Stat(statusFilePath)
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	return info.ModTime(), nil
 }

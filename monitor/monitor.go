@@ -5,6 +5,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/BenJuan26/elite"
@@ -111,7 +112,7 @@ func checkStatusAndUpdate() error {
 
 	}
 
-	status, err := elite.GetStatus()
+	status, err := elite.GetStatusFromPath(filepath.FromSlash(getLogDir()))
 	if err != nil {
 		errorCount = errorCount + 1
 		elog.Error(1, "Couldn't get status: "+err.Error())
@@ -121,7 +122,7 @@ func checkStatusAndUpdate() error {
 		return nil
 	}
 
-	system, err := elite.GetStarSystem()
+	system, err := elite.GetStarSystemFromPath(filepath.FromSlash(getLogDir()))
 	if err != nil {
 		errorCount = errorCount + 1
 		elog.Error(1, "Couldn't get star system: "+err.Error())

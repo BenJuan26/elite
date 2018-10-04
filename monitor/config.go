@@ -139,7 +139,6 @@ func interactiveConfig() error {
 	return nil
 }
 
-// GetPNPDeviceID gets the configured serial device PNP ID
 func getPNPDeviceID() string {
 	if configData == nil {
 		loadConfig(configPath())
@@ -147,10 +146,16 @@ func getPNPDeviceID() string {
 	return configData.PNPDeviceID
 }
 
-// GetBaudRate gets the configured serial baud rate
 func getBaudRate() int {
 	if configData == nil {
 		loadConfig(configPath())
 	}
 	return configData.BaudRate
+}
+
+func getLogDir() string {
+	if configData == nil {
+		loadConfig(configPath())
+	}
+	return configData.LogDir
 }

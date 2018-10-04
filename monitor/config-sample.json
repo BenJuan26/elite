@@ -1,4 +1,5 @@
 {
-    "pnp_device_id":"USB\\VID_16C0\u0026PID_0483\\4270260",
-    "baud_rate":9600
+    "pnp_device_id":"USB\\VID_4321&PID_0001\\1",
+    "baud_rate":9600,
+    "log_dir":"C:/Users/SampleUser/Saved Games/Frontier Developments/Elite Dangerous"
 }
