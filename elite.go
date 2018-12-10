@@ -42,6 +42,26 @@ const (
 	FlagInMainShip         uint32 = 0x01000000
 	FlagInFighter          uint32 = 0x02000000
 	FlagInSRV              uint32 = 0x04000000
+	FlagInAnalysisMode     uint32 = 0x08000000
+	FlagNightVision        uint32 = 0x10000000
+
+	GuiFocusNone            uint32 = 0
+	GuiFocusInternalPanel   uint32 = 1
+	GuiFocusExternalPanel   uint32 = 2
+	GuiFocusCommsPanel      uint32 = 3
+	GuiFocusRolePanel       uint32 = 4
+	GuiFocusStationServices uint32 = 5
+	GuiFocusGalaxyMap       uint32 = 6
+	GuiFocusSystemMap       uint32 = 7
+	GuiFocusOrrery          uint32 = 8
+	GuiFocusFSSMode         uint32 = 9
+	GuiFocusSAAMode         uint32 = 10
+	GuiFocusCodex           uint32 = 11
+
+	GuiFocusLeft   uint32 = GuiFocusExternalPanel
+	GuiFocusRight  uint32 = GuiFocusInternalPanel
+	GuiFocusTop    uint32 = GuiFocusCommsPanel
+	GuiFocusBottom uint32 = GuiFocusRolePanel
 )
 
 // StatusFlags contains boolean flags describing the player and ship
@@ -73,6 +93,8 @@ type StatusFlags struct {
 	InMainShip         bool
 	InFighter          bool
 	InSRV              bool
+	InAnalysisMode     bool
+	NightVision        bool
 }
 
 // Status represents the current state of the player and ship
@@ -134,6 +156,8 @@ func (status *Status) ExpandFlags() StatusFlags {
 	flags.InMainShip = status.Flags&FlagInMainShip != 0
 	flags.InFighter = status.Flags&FlagInFighter != 0
 	flags.InSRV = status.Flags&FlagInSRV != 0
+	flags.InAnalysisMode = status.Flags&FlagInAnalysisMode != 0
+	flags.NightVision = status.Flags&FlagNightVision != 0
 
 	return flags
 }
