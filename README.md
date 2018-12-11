@@ -11,9 +11,24 @@ go get github.com/BenJuan26/elite
 # Example Usage
 
 ```go
-system, err := elite.GetStarSystem()
-if err != nil {
-    panic("Couldn't get star system: " + err.Error())
+import (
+    "fmt"
+ 
+    "github.com/BenJuan26/elite"
+)
+
+
+func main() {
+    // Errors not handled here
+    system, _ := elite.GetStarSystem()
+    fmt.Println("Current star system is " + system)
+
+    status, _ := elite.GetStatus()
+    flags := status.ExpandFlags()
+    if flags.Docked {
+        fmt.Println("Ship is docked")
+    } else {
+        fmt.Println("Ship is not docked")
+    }
 }
-fmt.Println("Current star system is " + system)
 ```
