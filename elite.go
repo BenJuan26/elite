@@ -15,52 +15,97 @@ import (
 )
 
 const (
-	FlagDocked             uint32 = 0x00000001
-	FlagLanded             uint32 = 0x00000002
-	FlagLandingGearDown    uint32 = 0x00000004
-	FlagShieldsUp          uint32 = 0x00000008
-	FlagSupercruise        uint32 = 0x00000010
-	FlagFlightAssistOff    uint32 = 0x00000020
+	// FlagDocked indicates that the ship is docked.
+	FlagDocked uint32 = 0x00000001
+	// FlagLanded indicates that the ship is landed.
+	FlagLanded uint32 = 0x00000002
+	// FlagLandingGearDown indicates that the landing gear is deployed.
+	FlagLandingGearDown uint32 = 0x00000004
+	// FlagShieldsUp indicates that the ship's shields are up.
+	FlagShieldsUp uint32 = 0x00000008
+	// FlagSupercruise indicates that the ship is in supercruise.
+	FlagSupercruise uint32 = 0x00000010
+	// FlagFlightAssistOff indicates that flight assist is disabled.
+	FlagFlightAssistOff uint32 = 0x00000020
+	// FlagHardpointsDeployed indicates that the ship's hardpoints are deployed.
 	FlagHardpointsDeployed uint32 = 0x00000040
-	FlagInWing             uint32 = 0x00000080
-	FlagLightsOn           uint32 = 0x00000100
+	// FlagInWing indicates whether the player is in a wing.
+	FlagInWing uint32 = 0x00000080
+	// FlagLightsOn indicates that the ship's lights are on.
+	FlagLightsOn uint32 = 0x00000100
+	// FlagCargoScoopDeployed indicates that the cargo scoop is deployed.
 	FlagCargoScoopDeployed uint32 = 0x00000200
-	FlagSilentRunning      uint32 = 0x00000400
-	FlagScoopingFuel       uint32 = 0x00000800
-	FlagSRVHandbrake       uint32 = 0x00001000
-	FlagSRVTurret          uint32 = 0x00002000
-	FlagSRVUnderShip       uint32 = 0x00004000
-	FlagSRVDriveAssist     uint32 = 0x00008000
-	FlagFSDMassLocked      uint32 = 0x00010000
-	FlagFSDCharging        uint32 = 0x00020000
-	FlagFSDCooldown        uint32 = 0x00040000
-	FlagLowFuel            uint32 = 0x00080000
-	FlagOverheating        uint32 = 0x00100000
-	FlagHasLatLong         uint32 = 0x00200000
-	FlagIsInDanger         uint32 = 0x00400000
-	FlagBeingInterdicted   uint32 = 0x00800000
-	FlagInMainShip         uint32 = 0x01000000
-	FlagInFighter          uint32 = 0x02000000
-	FlagInSRV              uint32 = 0x04000000
-	FlagInAnalysisMode     uint32 = 0x08000000
-	FlagNightVision        uint32 = 0x10000000
+	// FlagSilentRunning indicates that silent running is on.
+	FlagSilentRunning uint32 = 0x00000400
+	// FlagScoopingFuel indicates that the ship is currently scooping fuel.
+	FlagScoopingFuel uint32 = 0x00000800
+	// FlagSRVHandbrake indicates that the SRV's handbrake is enabled.
+	FlagSRVHandbrake uint32 = 0x00001000
+	// FlagSRVTurret indicates that the SRV's turret is deployed.
+	FlagSRVTurret uint32 = 0x00002000
+	// FlagSRVUnderShip indicates that the SRV is positioned under the ship.
+	FlagSRVUnderShip uint32 = 0x00004000
+	// FlagSRVDriveAssist indicates that the SRV's drive assist is on.
+	FlagSRVDriveAssist uint32 = 0x00008000
+	// FlagFSDMassLocked indicates that the ship is mass locked.
+	FlagFSDMassLocked uint32 = 0x00010000
+	// FlagFSDCharging indicates that the FSD is charging.
+	FlagFSDCharging uint32 = 0x00020000
+	// FlagFSDCooldown indicates that the FSD is cooling down.
+	FlagFSDCooldown uint32 = 0x00040000
+	// FlagLowFuel indicates that the ship is low on fuel.
+	FlagLowFuel uint32 = 0x00080000
+	// FlagOverheating indicates that the ship is overheating.
+	FlagOverheating uint32 = 0x00100000
+	// FlagHasLatLong indicates that latitude and longitude data are available.
+	FlagHasLatLong uint32 = 0x00200000
+	// FlagIsInDanger indicates that the player is in danger.
+	FlagIsInDanger uint32 = 0x00400000
+	// FlagBeingInterdicted indicates that the ship is being interdicted.
+	FlagBeingInterdicted uint32 = 0x00800000
+	// FlagInMainShip indicates that the player is in the ship.
+	FlagInMainShip uint32 = 0x01000000
+	// FlagInFighter indicates that the player is in a fighter.
+	FlagInFighter uint32 = 0x02000000
+	// FlagInSRV indicates that the player is in an SRV.
+	FlagInSRV uint32 = 0x04000000
+	// FlagInAnalysisMode indicates that analysis mode is selected.
+	FlagInAnalysisMode uint32 = 0x08000000
+	// FlagNightVision indicates that night vision is enabled.
+	FlagNightVision uint32 = 0x10000000
 
-	GuiFocusNone            uint32 = 0
-	GuiFocusInternalPanel   uint32 = 1
-	GuiFocusExternalPanel   uint32 = 2
-	GuiFocusCommsPanel      uint32 = 3
-	GuiFocusRolePanel       uint32 = 4
+	// GuiFocusNone indicates that there is no menu panel focused.
+	GuiFocusNone uint32 = 0
+	// GuiFocusInternalPanel indicates that the internal menu panel is focused.
+	GuiFocusInternalPanel uint32 = 1
+	// GuiFocusExternalPanel indicates that the external menu panel is focused.
+	GuiFocusExternalPanel uint32 = 2
+	// GuiFocusCommsPanel indicates that the comms menu panel is focused.
+	GuiFocusCommsPanel uint32 = 3
+	// GuiFocusRolePanel indicates that the role menu panel is focused.
+	GuiFocusRolePanel uint32 = 4
+	// GuiFocusStationServices indicates that the station services menu is focused.
 	GuiFocusStationServices uint32 = 5
-	GuiFocusGalaxyMap       uint32 = 6
-	GuiFocusSystemMap       uint32 = 7
-	GuiFocusOrrery          uint32 = 8
-	GuiFocusFSSMode         uint32 = 9
-	GuiFocusSAAMode         uint32 = 10
-	GuiFocusCodex           uint32 = 11
+	// GuiFocusGalaxyMap indicates that the galaxy map is open.
+	GuiFocusGalaxyMap uint32 = 6
+	// GuiFocusSystemMap indicates that the system map is open.
+	GuiFocusSystemMap uint32 = 7
+	// GuiFocusOrrery indicates that the orrery is open.
+	GuiFocusOrrery uint32 = 8
+	// GuiFocusFSSMode indicates that the FSS is open.
+	GuiFocusFSSMode uint32 = 9
+	// GuiFocusSAAMode indicates that the SAA is focused.
+	GuiFocusSAAMode uint32 = 10
+	// GuiFocusCodex indicates that the codex is focused.
+	GuiFocusCodex uint32 = 11
 
-	GuiFocusLeft   uint32 = GuiFocusExternalPanel
-	GuiFocusRight  uint32 = GuiFocusInternalPanel
-	GuiFocusTop    uint32 = GuiFocusCommsPanel
+	// GuiFocusLeft is a helper alias for GuiFocusExternalPanel.
+	GuiFocusLeft uint32 = GuiFocusExternalPanel
+	// GuiFocusRight is a helper alias for GuiFocusInternalPanel.
+	GuiFocusRight uint32 = GuiFocusInternalPanel
+	// GuiFocusTop is a helper alias for GuiFocusCommsPanel.
+	GuiFocusTop uint32 = GuiFocusCommsPanel
+	// GuiFocusBottom is a helper alias for GuiFocusRolePanel.
 	GuiFocusBottom uint32 = GuiFocusRolePanel
 )
 
@@ -99,16 +144,17 @@ type StatusFlags struct {
 
 // Status represents the current state of the player and ship
 type Status struct {
-	Timestamp string   `json:"timestamp"`
-	Event     string   `json:"event"`
-	Flags     uint32   `json:"Flags"`
-	Pips      [3]int32 `json:"Pips"`
-	FireGroup int32    `json:"FireGroup"`
-	GuiFocus  int32    `json:"GuiFocus"`
-	Latitude  float64  `json:"Latitude,omitempty"`
-	Longitude float64  `json:"Longitude,omitempty"`
-	Heading   int32    `json:"Heading,omitempty"`
-	Altitude  int32    `json:"Altitude,omitempty"`
+	Timestamp string      `json:"timestamp"`
+	Event     string      `json:"event"`
+	Flags     StatusFlags `json:"-"`
+	RawFlags  uint32      `json:"Flags"`
+	Pips      [3]int32    `json:"Pips"`
+	FireGroup int32       `json:"FireGroup"`
+	GuiFocus  int32       `json:"GuiFocus"`
+	Latitude  float64     `json:"Latitude,omitempty"`
+	Longitude float64     `json:"Longitude,omitempty"`
+	Heading   int32       `json:"Heading,omitempty"`
+	Altitude  int32       `json:"Altitude,omitempty"`
 }
 
 type starSystemEvent struct {
@@ -126,40 +172,36 @@ func init() {
 }
 
 // ExpandFlags parses the flags value and returns the flags in a StatusFlags struct
-func (status *Status) ExpandFlags() StatusFlags {
-	flags := StatusFlags{}
-
-	flags.Docked = status.Flags&FlagDocked != 0
-	flags.Landed = status.Flags&FlagLanded != 0
-	flags.LandingGearDown = status.Flags&FlagLandingGearDown != 0
-	flags.ShieldsUp = status.Flags&FlagShieldsUp != 0
-	flags.Supercruise = status.Flags&FlagSupercruise != 0
-	flags.FlightAssistOff = status.Flags&FlagFlightAssistOff != 0
-	flags.HardpointsDeployed = status.Flags&FlagHardpointsDeployed != 0
-	flags.InWing = status.Flags&FlagInWing != 0
-	flags.LightsOn = status.Flags&FlagLightsOn != 0
-	flags.CargoScoopDeployed = status.Flags&FlagCargoScoopDeployed != 0
-	flags.SilentRunning = status.Flags&FlagSilentRunning != 0
-	flags.ScoopingFuel = status.Flags&FlagScoopingFuel != 0
-	flags.SRVHandbrake = status.Flags&FlagSRVHandbrake != 0
-	flags.SRVTurret = status.Flags&FlagSRVTurret != 0
-	flags.SRVUnderShip = status.Flags&FlagSRVUnderShip != 0
-	flags.SRVDriveAssist = status.Flags&FlagSRVDriveAssist != 0
-	flags.FSDMassLocked = status.Flags&FlagFSDMassLocked != 0
-	flags.FSDCharging = status.Flags&FlagFSDCharging != 0
-	flags.FSDCooldown = status.Flags&FlagFSDCooldown != 0
-	flags.LowFuel = status.Flags&FlagLowFuel != 0
-	flags.Overheating = status.Flags&FlagOverheating != 0
-	flags.HasLatLong = status.Flags&FlagHasLatLong != 0
-	flags.IsInDanger = status.Flags&FlagIsInDanger != 0
-	flags.BeingInterdicted = status.Flags&FlagBeingInterdicted != 0
-	flags.InMainShip = status.Flags&FlagInMainShip != 0
-	flags.InFighter = status.Flags&FlagInFighter != 0
-	flags.InSRV = status.Flags&FlagInSRV != 0
-	flags.InAnalysisMode = status.Flags&FlagInAnalysisMode != 0
-	flags.NightVision = status.Flags&FlagNightVision != 0
-
-	return flags
+func (status *Status) ExpandFlags() {
+	status.Flags.Docked = status.RawFlags&FlagDocked != 0
+	status.Flags.Landed = status.RawFlags&FlagLanded != 0
+	status.Flags.LandingGearDown = status.RawFlags&FlagLandingGearDown != 0
+	status.Flags.ShieldsUp = status.RawFlags&FlagShieldsUp != 0
+	status.Flags.Supercruise = status.RawFlags&FlagSupercruise != 0
+	status.Flags.FlightAssistOff = status.RawFlags&FlagFlightAssistOff != 0
+	status.Flags.HardpointsDeployed = status.RawFlags&FlagHardpointsDeployed != 0
+	status.Flags.InWing = status.RawFlags&FlagInWing != 0
+	status.Flags.LightsOn = status.RawFlags&FlagLightsOn != 0
+	status.Flags.CargoScoopDeployed = status.RawFlags&FlagCargoScoopDeployed != 0
+	status.Flags.SilentRunning = status.RawFlags&FlagSilentRunning != 0
+	status.Flags.ScoopingFuel = status.RawFlags&FlagScoopingFuel != 0
+	status.Flags.SRVHandbrake = status.RawFlags&FlagSRVHandbrake != 0
+	status.Flags.SRVTurret = status.RawFlags&FlagSRVTurret != 0
+	status.Flags.SRVUnderShip = status.RawFlags&FlagSRVUnderShip != 0
+	status.Flags.SRVDriveAssist = status.RawFlags&FlagSRVDriveAssist != 0
+	status.Flags.FSDMassLocked = status.RawFlags&FlagFSDMassLocked != 0
+	status.Flags.FSDCharging = status.RawFlags&FlagFSDCharging != 0
+	status.Flags.FSDCooldown = status.RawFlags&FlagFSDCooldown != 0
+	status.Flags.LowFuel = status.RawFlags&FlagLowFuel != 0
+	status.Flags.Overheating = status.RawFlags&FlagOverheating != 0
+	status.Flags.HasLatLong = status.RawFlags&FlagHasLatLong != 0
+	status.Flags.IsInDanger = status.RawFlags&FlagIsInDanger != 0
+	status.Flags.BeingInterdicted = status.RawFlags&FlagBeingInterdicted != 0
+	status.Flags.InMainShip = status.RawFlags&FlagInMainShip != 0
+	status.Flags.InFighter = status.RawFlags&FlagInFighter != 0
+	status.Flags.InSRV = status.RawFlags&FlagInSRV != 0
+	status.Flags.InAnalysisMode = status.RawFlags&FlagInAnalysisMode != 0
+	status.Flags.NightVision = status.RawFlags&FlagNightVision != 0
 }
 
 // GetStarSystem returns the current star system
@@ -231,27 +273,19 @@ func GetStatusFromPath(logPath string) (*Status, error) {
 			continue
 		}
 
-		status := &Status{}
-		if err := json.Unmarshal(statusBytes, status); err != nil {
-			retries = retries - 1
-			time.Sleep(3 * time.Millisecond)
-			continue
-		}
-
-		return status, nil
+		return GetStatusFromBytes(statusBytes)
 	}
 
 	return nil, errors.New("Couldn't get status after 5 attempts")
 }
 
-// GetStatusFromString reads the current player and ship status from Status.json
-func GetStatusFromString(content string) (*Status, error) {
-	statusBytes := []byte(content)
-
+// GetStatusFromBytes reads the current player and ship status from the string contained in the byte array
+func GetStatusFromBytes(content []byte) (*Status, error) {
 	status := &Status{}
-	if err := json.Unmarshal(statusBytes, status); err != nil {
+	if err := json.Unmarshal(content, status); err != nil {
 		return nil, errors.New("Couldn't unmarshal Status.json file: " + err.Error())
 	}
 
+	status.ExpandFlags()
 	return status, nil
 }
