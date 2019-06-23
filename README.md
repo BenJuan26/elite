@@ -24,8 +24,7 @@ func main() {
     fmt.Println("Current star system is " + system)
 
     status, _ := elite.GetStatus()
-    flags := status.ExpandFlags()
-    if flags.Docked {
+    if status.Flags.Docked {
         fmt.Println("Ship is docked")
     } else {
         fmt.Println("Ship is not docked")
