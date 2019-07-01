@@ -1,12 +1,14 @@
-package elite
+package elite_test
 
 import (
 	"fmt"
 	"testing"
+
+    "github.com/BenJuan26/elite"
 )
 
 func TestGetStatusFromString(t *testing.T) {
-	status, err := GetStatusFromBytes([]byte(`{"timestamp":"2017-12-07T10:31:37Z", "event":"Status", "Flags":16842765, "Pips":[2,8,2], "FireGroup":0, "GuiFocus":5}`))
+	status, err := elite.GetStatusFromBytes([]byte(`{"timestamp":"2017-12-07T10:31:37Z", "event":"Status", "Flags":16842765, "Pips":[2,8,2], "FireGroup":0, "GuiFocus":5}`))
 	if err != nil {
 		fmt.Println("Couldn't get status: " + err.Error())
 		t.FailNow()
@@ -47,9 +49,22 @@ func TestGetStatusFromString(t *testing.T) {
 }
 
 func TestGetStatus(t *testing.T) {
-	_, err := GetStatus()
+	_, err := elite.GetStatus()
 	if err != nil {
 		fmt.Println("Couldn't get status: " + err.Error())
 		t.FailNow()
 	}
+}
+
+func Example() {
+    // Errors not handled here
+    system, _ := elite.GetStarSystem()
+    fmt.Println("Current star system is " + system)
+
+    status, _ := elite.GetStatus()
+    if status.Flags.Docked {
+        fmt.Println("Ship is docked")
+    } else {
+        fmt.Println("Ship is not docked")
+    }
 }

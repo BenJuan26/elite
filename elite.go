@@ -1,5 +1,5 @@
-// +build windows
-
+// Package elite provides real-time data from Elite Dangerous through
+// files written to disk by the game.
 package elite
 
 import (
@@ -109,7 +109,7 @@ const (
 	GuiFocusBottom uint32 = GuiFocusRolePanel
 )
 
-// StatusFlags contains boolean flags describing the player and ship
+// StatusFlags contains boolean flags describing the player and ship.
 type StatusFlags struct {
 	Docked             bool
 	Landed             bool
@@ -142,7 +142,7 @@ type StatusFlags struct {
 	NightVision        bool
 }
 
-// Status represents the current state of the player and ship
+// Status represents the current state of the player and ship.
 type Status struct {
 	Timestamp string      `json:"timestamp"`
 	Event     string      `json:"event"`
@@ -171,7 +171,7 @@ func init() {
 	defaultLogPath = filepath.FromSlash(homeDir + "/Saved Games/Frontier Developments/Elite Dangerous")
 }
 
-// ExpandFlags parses the flags value and returns the flags in a StatusFlags struct
+// ExpandFlags parses the RawFlags and sets the Flags values accordingly.
 func (status *Status) ExpandFlags() {
 	status.Flags.Docked = status.RawFlags&FlagDocked != 0
 	status.Flags.Landed = status.RawFlags&FlagLanded != 0
@@ -204,12 +204,12 @@ func (status *Status) ExpandFlags() {
 	status.Flags.NightVision = status.RawFlags&FlagNightVision != 0
 }
 
-// GetStarSystem returns the current star system
+// GetStarSystem returns the current star system.
 func GetStarSystem() (string, error) {
 	return GetStarSystemFromPath(defaultLogPath)
 }
 
-// GetStarSystemFromPath returns the current star system using the specified log path
+// GetStarSystemFromPath returns the current star system using the specified log path.
 func GetStarSystemFromPath(logPath string) (string, error) {
 	files, _ := ioutil.ReadDir(logPath)
 	journalFilePattern, err := regexp.Compile(`^Journal\.\d{12}\.\d{2}\.log$`)
@@ -248,12 +248,18 @@ func GetStarSystemFromPath(logPath string) (string, error) {
 	return event.StarSystem, nil
 }
 
-// GetStatus reads the current player and ship status from Status.json
+// GetStatus reads the current player and ship status from Status.json.
+// It will read them from the default log path, which is the Saved Games
+// folder. The full path is:
+//
+//     C:/Users/<Username>/Saved Games/Frontier Developments/Elite Dangerous
+//
+// If that path is not suitable, use GetStatusFromPath.
 func GetStatus() (*Status, error) {
 	return GetStatusFromPath(defaultLogPath)
 }
 
-// GetStatusFromPath reads the current player and ship status from Status.json at the specified log path
+// GetStatusFromPath reads the current player and ship status from Status.json at the specified log path.
 func GetStatusFromPath(logPath string) (*Status, error) {
 	statusFilePath := filepath.FromSlash(logPath + "/Status.json")
 	retries := 5
@@ -279,7 +285,7 @@ func GetStatusFromPath(logPath string) (*Status, error) {
 	return nil, errors.New("Couldn't get status after 5 attempts")
 }
 
-// GetStatusFromBytes reads the current player and ship status from the string contained in the byte array
+// GetStatusFromBytes reads the current player and ship status from the string contained in the byte array.
 func GetStatusFromBytes(content []byte) (*Status, error) {
 	status := &Status{}
 	if err := json.Unmarshal(content, status); err != nil {
