@@ -1,5 +1,7 @@
 # elite
 
+[![](https://godoc.org/github.com/BenJuan26/elite?status.svg)](https://godoc.org/github.com/BenJuan26/elite)
+
 Go API for Elite Dangerous
 
 # Installation
