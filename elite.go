@@ -142,6 +142,12 @@ type StatusFlags struct {
 	NightVision        bool
 }
 
+// Fuel contains fuel readouts for the ship.
+type Fuel struct {
+	Main      float64 `json:"FuelMain"`
+	Reservoir float64 `json:"FuelReservoir"`
+}
+
 // Status represents the current state of the player and ship.
 type Status struct {
 	Timestamp string      `json:"timestamp"`
@@ -151,6 +157,8 @@ type Status struct {
 	Pips      [3]int32    `json:"Pips"`
 	FireGroup int32       `json:"FireGroup"`
 	GuiFocus  int32       `json:"GuiFocus"`
+	Fuel      Fuel        `json:"Fuel"`
+	Cargo     int64       `json:"Cargo"`
 	Latitude  float64     `json:"Latitude,omitempty"`
 	Longitude float64     `json:"Longitude,omitempty"`
 	Heading   int32       `json:"Heading,omitempty"`

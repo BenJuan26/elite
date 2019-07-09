@@ -1,21 +1,21 @@
 # elite
 
-[![](https://godoc.org/github.com/BenJuan26/elite?status.svg)](https://godoc.org/github.com/BenJuan26/elite)
+[![GoDoc reference](https://godoc.org/github.com/BenJuan26/elite?status.svg)](https://godoc.org/github.com/BenJuan26/elite)
 
 Go API for Elite Dangerous
 
-# Installation
+## Installation
 
 ```bash
 go get github.com/BenJuan26/elite
 ```
 
-# Example Usage
+## Example Usage
 
 ```go
 import (
     "fmt"
- 
+
     "github.com/BenJuan26/elite"
 )
 
