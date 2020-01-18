@@ -126,6 +126,19 @@ func TestGetLoadoutFromPath(t *testing.T) {
 	}
 }
 
+func TestGetStatisticsFromPath(t *testing.T) {
+	stats, err := elite.GetStatisticsFromPath(testLogPath)
+	if err != nil {
+		fmt.Println("Couldn't get statistics: " + err.Error())
+		t.FailNow()
+	}
+
+	expectedWealth := int64(951994467)
+	if stats.BankAccount.CurrentWealth != expectedWealth {
+		fmt.Printf("Incorrect wealth value: Expected %d, got %d\n", expectedWealth, stats.BankAccount.CurrentWealth)
+	}
+}
+
 func Example() {
 	// Errors not handled here
 	system, _ := elite.GetStarSystem()
