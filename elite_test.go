@@ -7,6 +7,8 @@ import (
 	"github.com/BenJuan26/elite"
 )
 
+var testLogPath = "./test"
+
 func TestGetStatusFromString(t *testing.T) {
 	status, err := elite.GetStatusFromBytes([]byte(`{"timestamp":"2017-12-07T10:31:37Z", "event":"Status", "Flags":16842765, "Pips":[2,8,2], "FireGroup":0, "GuiFocus":5}`))
 	if err != nil {
@@ -49,7 +51,7 @@ func TestGetStatusFromString(t *testing.T) {
 }
 
 func TestGetStatusFromPath(t *testing.T) {
-	status, err := elite.GetStatusFromPath("./test")
+	status, err := elite.GetStatusFromPath(testLogPath)
 	if err != nil {
 		fmt.Println("Couldn't get status: " + err.Error())
 		t.FailNow()
@@ -98,7 +100,7 @@ func TestGetStatus(t *testing.T) {
 }
 
 func TestGetStarSystemFromPath(t *testing.T) {
-	sys, err := elite.GetStarSystemFromPath("./test")
+	sys, err := elite.GetStarSystemFromPath(testLogPath)
 	if err != nil {
 		fmt.Println("An error occurred while getting the star system: " + err.Error())
 		t.FailNow()
@@ -106,6 +108,20 @@ func TestGetStarSystemFromPath(t *testing.T) {
 
 	if sys != "Sol" {
 		fmt.Println("Incorrect star system: Expecting Sol, got " + sys)
+		t.FailNow()
+	}
+}
+
+func TestGetLoadoutFromPath(t *testing.T) {
+	loadout, err := elite.GetLoadoutFromPath(testLogPath)
+	if err != nil {
+		fmt.Println("Couldn't get loadout: " + err.Error())
+		t.FailNow()
+	}
+
+	expectedShipName := "dora winifred"
+	if loadout.ShipName != expectedShipName {
+		fmt.Printf("Incorrect ship name: Expecting %s, got %s\n", expectedShipName, loadout.ShipName)
 		t.FailNow()
 	}
 }
