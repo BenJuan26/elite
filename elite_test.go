@@ -9,14 +9,19 @@ import (
 
 var testLogPath = "./test"
 
-func TestGetStatusFromString(t *testing.T) {
-	status, err := elite.GetStatusFromBytes([]byte(`{"timestamp":"2017-12-07T10:31:37Z", "event":"Status", "Flags":16842765, "Pips":[2,8,2], "FireGroup":0, "GuiFocus":5}`))
+func TestGetStatusFromBytes(t *testing.T) {
+	status, err := elite.GetStatusFromBytes([]byte(`{"timestamp":"2017-12-07T10:31:37Z", "event":"Status", "Flags":553713677, "Pips":[2,8,2], "FireGroup":0, "GuiFocus":5}`))
 	if err != nil {
 		fmt.Println("Couldn't get status: " + err.Error())
 		t.FailNow()
 	}
 
-	if !status.Flags.Docked || !status.Flags.ShieldsUp || !status.Flags.InMainShip || !status.Flags.LandingGearDown || !status.Flags.FSDMassLocked {
+	if !status.Flags.Docked ||
+		!status.Flags.ShieldsUp ||
+		!status.Flags.InMainShip ||
+		!status.Flags.LandingGearDown ||
+		!status.Flags.FSDMassLocked ||
+		!status.Flags.AltitudeFromAverageRadius {
 		fmt.Println("Parsed flags were incorrect")
 		t.FailNow()
 	}
@@ -44,7 +49,9 @@ func TestGetStatusFromString(t *testing.T) {
 		status.Flags.InFighter ||
 		status.Flags.InSRV ||
 		status.Flags.InAnalysisMode ||
-		status.Flags.NightVision {
+		status.Flags.NightVision ||
+		status.Flags.FSDJump ||
+		status.Flags.SRVHighBeam {
 		fmt.Println("Parsed flags were incorrect")
 		t.FailNow()
 	}
@@ -57,7 +64,12 @@ func TestGetStatusFromPath(t *testing.T) {
 		t.FailNow()
 	}
 
-	if !status.Flags.Docked || !status.Flags.ShieldsUp || !status.Flags.InMainShip || !status.Flags.LandingGearDown || !status.Flags.FSDMassLocked {
+	if !status.Flags.Docked ||
+		!status.Flags.ShieldsUp ||
+		!status.Flags.InMainShip ||
+		!status.Flags.LandingGearDown ||
+		!status.Flags.FSDMassLocked ||
+		!status.Flags.AltitudeFromAverageRadius {
 		fmt.Println("Parsed flags were incorrect")
 		t.FailNow()
 	}
@@ -85,7 +97,9 @@ func TestGetStatusFromPath(t *testing.T) {
 		status.Flags.InFighter ||
 		status.Flags.InSRV ||
 		status.Flags.InAnalysisMode ||
-		status.Flags.NightVision {
+		status.Flags.NightVision ||
+		status.Flags.FSDJump ||
+		status.Flags.SRVHighBeam {
 		fmt.Println("Parsed flags were incorrect")
 		t.FailNow()
 	}

@@ -59,7 +59,14 @@ const (
 	FlagInAnalysisMode uint32 = 0x08000000
 	// FlagNightVision indicates that night vision is enabled.
 	FlagNightVision uint32 = 0x10000000
-
+	// FlagAltitudeFromAverageRadius indicates that the altitude value is based on the planet's average radius
+	// (used at higher altitudes). If it is not set, the Altitude value is based on a raycast to the
+	// actual surface below the ship/SRV.
+	FlagAltitudeFromAverageRadius uint32 = 0x20000000
+	// FlagFSDJump indicates that the ship is undergoing an FSD jump.
+	FlagFSDJump uint32 = 0x40000000
+	// FlagSRVHighBeam indicates that the SRV's high beams are on.
+	FlagSRVHighBeam uint32 = 0x80000000
 	// GuiFocusNone indicates that there is no menu panel focused.
 	GuiFocusNone uint32 = 0
 	// GuiFocusInternalPanel indicates that the internal menu panel is focused.
@@ -97,35 +104,38 @@ const (
 
 // StatusFlags contains boolean flags describing the player and ship.
 type StatusFlags struct {
-	Docked             bool
-	Landed             bool
-	LandingGearDown    bool
-	ShieldsUp          bool
-	Supercruise        bool
-	FlightAssistOff    bool
-	HardpointsDeployed bool
-	InWing             bool
-	LightsOn           bool
-	CargoScoopDeployed bool
-	SilentRunning      bool
-	ScoopingFuel       bool
-	SRVHandbrake       bool
-	SRVTurret          bool
-	SRVUnderShip       bool
-	SRVDriveAssist     bool
-	FSDMassLocked      bool
-	FSDCharging        bool
-	FSDCooldown        bool
-	LowFuel            bool
-	Overheating        bool
-	HasLatLong         bool
-	IsInDanger         bool
-	BeingInterdicted   bool
-	InMainShip         bool
-	InFighter          bool
-	InSRV              bool
-	InAnalysisMode     bool
-	NightVision        bool
+	Docked                    bool
+	Landed                    bool
+	LandingGearDown           bool
+	ShieldsUp                 bool
+	Supercruise               bool
+	FlightAssistOff           bool
+	HardpointsDeployed        bool
+	InWing                    bool
+	LightsOn                  bool
+	CargoScoopDeployed        bool
+	SilentRunning             bool
+	ScoopingFuel              bool
+	SRVHandbrake              bool
+	SRVTurret                 bool
+	SRVUnderShip              bool
+	SRVDriveAssist            bool
+	FSDMassLocked             bool
+	FSDCharging               bool
+	FSDCooldown               bool
+	LowFuel                   bool
+	Overheating               bool
+	HasLatLong                bool
+	IsInDanger                bool
+	BeingInterdicted          bool
+	InMainShip                bool
+	InFighter                 bool
+	InSRV                     bool
+	InAnalysisMode            bool
+	NightVision               bool
+	AltitudeFromAverageRadius bool
+	FSDJump                   bool
+	SRVHighBeam               bool
 }
 
 // ExpandFlags parses the RawFlags and sets the Flags values accordingly.
@@ -159,4 +169,7 @@ func (status *Status) ExpandFlags() {
 	status.Flags.InSRV = status.RawFlags&FlagInSRV != 0
 	status.Flags.InAnalysisMode = status.RawFlags&FlagInAnalysisMode != 0
 	status.Flags.NightVision = status.RawFlags&FlagNightVision != 0
+	status.Flags.AltitudeFromAverageRadius = status.RawFlags&FlagAltitudeFromAverageRadius != 0
+	status.Flags.FSDJump = status.RawFlags&FlagFSDJump != 0
+	status.Flags.SRVHighBeam = status.RawFlags&FlagSRVHighBeam != 0
 }
