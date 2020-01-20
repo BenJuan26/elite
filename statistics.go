@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 )
 
+// BankAccountStats contains statistics about the player's money and spending.
 type BankAccountStats struct {
 	CurrentWealth          int64 `json:"Current_Wealth"`
 	SpentOnShips           int64 `json:"Spent_On_Ships"`
@@ -21,6 +22,7 @@ type BankAccountStats struct {
 	OwnedShipCount         int64 `json:"Owned_Ship_Count"`
 }
 
+// CombatStats contains statistics about combat and bounty.
 type CombatStats struct {
 	BountiesClaimed      int64 `json:"Bounties_Claimed"`
 	BountyHuntingProfit  int64 `json:"Bounty_Hunting_Profit"`
@@ -32,6 +34,7 @@ type CombatStats struct {
 	SkimmersKilled       int64 `json:"Skimmers_Killed"`
 }
 
+// CrimeStats contains statistics about crime.
 type CrimeStats struct {
 	Notoriety        int64 `json:"Notoriety"`
 	Fines            int64 `json:"Fines"`
@@ -41,6 +44,7 @@ type CrimeStats struct {
 	HighestBounty    int64 `json:"Highest_Bounty"`
 }
 
+// SmugglingStats contains statistics about smuggling.
 type SmugglingStats struct {
 	BlackMarketsTradedWith   int64   `json:"Black_Markets_Traded_With"`
 	BlackMarketsProfits      int64   `json:"Black_Markets_Profits"`
@@ -49,6 +53,7 @@ type SmugglingStats struct {
 	HighestSingleTransaction int64   `json:"Highest_Single_Transaction"`
 }
 
+// TradingStats contains statistics about trading.
 type TradingStats struct {
 	MarketsTradedWith        int64   `json:"Markets_Traded_With"`
 	MarketProfits            int64   `json:"Market_Profits"`
@@ -57,25 +62,28 @@ type TradingStats struct {
 	HighestSingleTransaction int64   `json:"Highest_Single_Transaction"`
 }
 
+// MiningStats contains statistics about mining.
 type MiningStats struct {
 	MiningProfits      int64 `json:"Mining_Profits"`
 	QuantityMined      int64 `json:"Quantity_Mined"`
 	MaterialsCollected int64 `json:"Materials_Collected"`
 }
 
+// ExplorationStats contains statistics about exploration.
 type ExplorationStats struct {
-	SystemsVisited            int64 `json:"Systems_Visited"`
-	ExplorationProfits        int64 `json:"Exploration_Profits"`
-	PlanetsScannedToLevel2    int64 `json:"Planets_Scanned_To_Level_2"`
-	PlanetsScannedToLevel3    int64 `json:"Planets_Scanned_To_Level_3"`
-	EfficientScans            int64 `json:"Efficient_Scans"`
-	HighestPayout             int64 `json:"Highest_Payout"`
-	TotalHyperspaceDistance   int64 `json:"Total_Hyperspace_Distance"`
-	TotalHyperspaceJumps      int64 `json:"Total_Hyperspace_Jumps"`
-	GreatestDistanceFromStart float64
-	TimePlayed                int64 `json:"Time_Played"`
+	SystemsVisited            int64   `json:"Systems_Visited"`
+	ExplorationProfits        int64   `json:"Exploration_Profits"`
+	PlanetsScannedToLevel2    int64   `json:"Planets_Scanned_To_Level_2"`
+	PlanetsScannedToLevel3    int64   `json:"Planets_Scanned_To_Level_3"`
+	EfficientScans            int64   `json:"Efficient_Scans"`
+	HighestPayout             int64   `json:"Highest_Payout"`
+	TotalHyperspaceDistance   int64   `json:"Total_Hyperspace_Distance"`
+	TotalHyperspaceJumps      int64   `json:"Total_Hyperspace_Jumps"`
+	GreatestDistanceFromStart float64 `json:"Greatest_Distance_From_Start"`
+	TimePlayed                int64   `json:"Time_Played"`
 }
 
+// PassengersStats contains statistics about passenger missions.
 type PassengersStats struct {
 	PassengersMissionsAccepted  int64 `json:"Passengers_Missions_Accepted"`
 	PassengersMissionsBulk      int64 `json:"Passengers_Missions_Bulk"`
@@ -84,12 +92,14 @@ type PassengersStats struct {
 	PassengersMissionsEjected   int64 `json:"Passengers_Missions_Ejected"`
 }
 
+// SearchAndRescueStats contains statistics about search and rescue.
 type SearchAndRescueStats struct {
 	SearchRescueTraded int64 `json:"SearchRescue_Traded"`
 	SearchRescueProfit int64 `json:"SearchRescue_Profit"`
 	SearchRescueCount  int64 `json:"SearchRescue_Count"`
 }
 
+// CraftingStats contains statistics about crafting.
 type CraftingStats struct {
 	CountOfUsedEngineers  int64 `json:"Count_Of_Used_Engineers"`
 	RecipesGenerated      int64 `json:"Recipes_Generated"`
@@ -100,9 +110,10 @@ type CraftingStats struct {
 	RecipesGeneratedRank5 int64 `json:"Recipes_Generated_Rank_5"`
 }
 
-type CrewStats struct {
-}
+// type CrewStats struct {
+// }
 
+// MulticrewStats contains statistics about multicrew.
 type MulticrewStats struct {
 	MulticrewTimeTotal        int64 `json:"Multicrew_Time_Total"`
 	MulticrewGunnerTimeTotal  int64 `json:"Multicrew_Gunner_Time_Total"`
@@ -111,6 +122,7 @@ type MulticrewStats struct {
 	MulticrewFinesTotal       int64 `json:"Multicrew_Fines_Total"`
 }
 
+// MaterialTraderStats contains statistics about use of the Material Trader.
 type MaterialTraderStats struct {
 	TradesCompleted        int64 `json:"Trades_Completed"`
 	MaterialsTraded        int64 `json:"Materials_Traded"`
@@ -122,6 +134,8 @@ type MaterialTraderStats struct {
 	Grade5MaterialsTraded  int64 `json:"Grade_5_Materials_Traded"`
 }
 
+// Statistics is the main statistics object.
+// The statistics are divided into different categories contains by several fields.
 type Statistics struct {
 	*JournalEntry
 	BankAccount     BankAccountStats     `json:"Bank_Account"`
@@ -134,9 +148,9 @@ type Statistics struct {
 	Passengers      PassengersStats      `json:"Passengers"`
 	SearchAndRescue SearchAndRescueStats `json:"Search_And_Rescue"`
 	Crafting        CraftingStats        `json:"Crafting"`
-	Crew            CrewStats            `json:"Crew"`
-	Multicrew       MulticrewStats       `json:"Multicrew"`
-	MaterialTrader  MaterialTraderStats  `json:"Material_Trader_Stats"`
+	// Crew            CrewStats            `json:"Crew"`
+	Multicrew      MulticrewStats      `json:"Multicrew"`
+	MaterialTrader MaterialTraderStats `json:"Material_Trader_Stats"`
 }
 
 // GetStatisticsFromPath returns game statistics using the specified log path.
