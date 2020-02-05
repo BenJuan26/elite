@@ -17,6 +17,10 @@ At the moment that includes things like:
 
 For a more complete picture of what can be obtained from the API, [see the documentation](https://godoc.org/github.com/BenJuan26/elite).
 
+## Motivation
+
+I wrote this API in order to pass the data to [a custom controller](https://github.com/BenJuan26/edca) that I'm making for the game. I kept it as a separate package so that it could be consumed by anybody that might find the data useful. I think it could also be useful for a dashboard-type project, and in fact, the controller will have a display on it that will provide some of the info supplied by this API.
+
 ## Installation
 
 ```bash
