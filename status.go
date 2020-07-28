@@ -25,7 +25,7 @@ type Status struct {
 	FireGroup int32       `json:"FireGroup"`
 	GuiFocus  int32       `json:"GuiFocus"`
 	Fuel      Fuel        `json:"Fuel"`
-	Cargo     int64       `json:"Cargo"`
+	Cargo     float64     `json:"Cargo"`
 	Latitude  float64     `json:"Latitude,omitempty"`
 	Longitude float64     `json:"Longitude,omitempty"`
 	Heading   int32       `json:"Heading,omitempty"`
