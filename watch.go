@@ -7,7 +7,7 @@ import (
 )
 
 // WatchLocationChange will watch logs folder for changes and scan log files for the new location
-func WatchLocationChange(f func(location string)) error {
+func WatchLocationChange(f func(system, station string)) error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -15,6 +15,7 @@ func WatchLocationChange(f func(location string)) error {
 	defer watcher.Close()
 	go func() {
 		var lastSystem string
+		var lastStation string
 		for {
 			select {
 			case event, ok := <-watcher.Events:
@@ -22,15 +23,21 @@ func WatchLocationChange(f func(location string)) error {
 					return
 				}
 				if event.Has(fsnotify.Write) {
-					ss, serr := GetStarSystem()
+					system, serr := GetStarSystem()
 					if serr != nil {
 						continue
 					}
-					if lastSystem != ss {
-						f(ss)
-						lastSystem = ss
+
+					station, serr := GetCurrentStation()
+					if serr != nil {
+						continue
 					}
 
+					if lastSystem != system || lastStation != station {
+						f(system, station)
+						lastSystem = system
+						lastStation = station
+					}
 				}
 			case _, ok := <-watcher.Errors:
 				if !ok {
