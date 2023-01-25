@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/BenJuan26/elite/loadout"
+	"github.com/FlameInTheDark/elite/loadout"
 )
 
 // Loadout contains information about the player's ship, its status, and its modules.
@@ -68,7 +68,7 @@ func GetLoadoutFromPath(logPath string) (*Loadout, error) {
 // It will read them from the default log path, which is the Saved Games
 // folder. The full path is:
 //
-//     C:/Users/<Username>/Saved Games/Frontier Developments/Elite Dangerous
+//	C:/Users/<Username>/Saved Games/Frontier Developments/Elite Dangerous
 //
 // If that path is not suitable, use GetLoadoutFromPath.
 func GetLoadout() (*Loadout, error) {

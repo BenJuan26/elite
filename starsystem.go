@@ -41,7 +41,10 @@ func GetStarSystemFromPath(logPath string) (string, error) {
 		scanner := bufio.NewScanner(journalFile)
 		for scanner.Scan() {
 			var tempEvent StarSystemEvent
-			json.Unmarshal([]byte(scanner.Text()), &tempEvent)
+			err := json.Unmarshal([]byte(scanner.Text()), &tempEvent)
+			if err != nil {
+				return "", err
+			}
 			if tempEvent.Event == "FSDJump" || tempEvent.Event == "Location" {
 				event = tempEvent
 				found = true

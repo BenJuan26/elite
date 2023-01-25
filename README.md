@@ -1,6 +1,6 @@
 # elite
 
-[![GoDoc reference](https://godoc.org/github.com/BenJuan26/elite?status.svg)](https://godoc.org/github.com/BenJuan26/elite)
+[![GoDoc reference](https://godoc.org/github.com/FlameInTheDark/elite?status.svg)](https://godoc.org/github.com/FlameInTheDark/elite)
 
 Go API for [Elite Dangerous](https://elitedangerous.com)
 
@@ -10,12 +10,12 @@ This API can be used to extract data from Elite Dangerous while the game is runn
 
 At the moment that includes things like:
 
-* The status of many ship properties, such as night vision, landing gear, headlights, and [many more](https://godoc.org/github.com/BenJuan26/elite/flags).
+* The status of many ship properties, such as night vision, landing gear, headlights, and [many more](https://godoc.org/github.com/FlameInTheDark/elite/flags).
 * The current star system.
 * Information about the ship, such as hull, shields, jump range, and modules.
 * Players stats regarding things like combat, mining, exploration, and trading.
 
-For a more complete picture of what can be obtained from the API, [see the documentation](https://godoc.org/github.com/BenJuan26/elite).
+For a more complete picture of what can be obtained from the API, [see the documentation](https://godoc.org/github.com/FlameInTheDark/elite).
 
 ## Motivation
 
@@ -24,7 +24,7 @@ I wrote this API in order to pass the data to [a custom controller](https://gith
 ## Installation
 
 ```bash
-go get github.com/BenJuan26/elite
+go get github.com/FlameInTheDark/elite
 ```
 
 ## Example Usage
@@ -33,7 +33,7 @@ go get github.com/BenJuan26/elite
 import (
     "fmt"
 
-    "github.com/BenJuan26/elite"
+    "github.com/FlameInTheDark/elite"
 )
 
 func main() {

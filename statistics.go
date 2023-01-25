@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/BenJuan26/elite/stats"
+	"github.com/FlameInTheDark/elite/stats"
 )
 
 // Statistics is the main statistics object.
@@ -69,7 +69,7 @@ func GetStatisticsFromPath(logPath string) (*Statistics, error) {
 // It will read them from the default log path, which is the Saved Games
 // folder. The full path is:
 //
-//     C:/Users/<Username>/Saved Games/Frontier Developments/Elite Dangerous
+//	C:/Users/<Username>/Saved Games/Frontier Developments/Elite Dangerous
 //
 // If that path is not suitable, use GetStatisticsFromPath.
 func GetStatistics() (*Statistics, error) {
