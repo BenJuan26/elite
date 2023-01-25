@@ -23,5 +23,5 @@ func init() {
 	currUser, _ := user.Current()
 	homeDir := currUser.HomeDir
 	defaultLogPath = filepath.FromSlash(homeDir + "/Saved Games/Frontier Developments/Elite Dangerous")
-	journalFilePattern = regexp.MustCompile(`^Journal\.\d{12}\.\d{2}\.log$`)
+	journalFilePattern = regexp.MustCompile(`^Journal\.\d{4}\-\d{2}\-\d{2}T\d{6}\.\d{2}\.log$`)
 }
